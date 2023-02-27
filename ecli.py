@@ -8,11 +8,11 @@ from rich.table import Table
 console = Console()
 
 # Temporary solution to set URL
-uservar = 2
+uservar = 1
 uservar = int(uservar)
 if uservar == 1:
     userapiurl = "https://api.emlalock.com/info?userid=s9n33u90x27jqsr&apikey=1intd05gi0l"
-    useruuid = "addthislater"
+    useruuid = "s9n33u90x27jqsr"
 elif uservar == 2:
     userapiurl = "https://api.emlalock.com/info?userid=4d89h9ev72jmft8&apikey=wh2wqiikwn"
     useruuid = "4d89h9ev72jmft8"
@@ -45,6 +45,11 @@ def get_time_stats():
     timeInLock = endDate - startDate
     timeInLockFriendly = datetime.datetime.fromtimestamp(timeInLock)
 
+def showall():
+    global showallthedata
+    sessionDict = json.loads(text)
+    showallthedata = sessionDict['chastitysession']['duration']
+
 @click.group()
 def cli():
     pass
@@ -60,7 +65,7 @@ def version():
 @cli.command()
 @click.option('--username', required=False, default ="geronimo",
     help ='Show user account being queried')
-def showuser(username):
+def show_user(username):
     click.echo("User account: {}".format(username))
 
 @cli.command()
@@ -83,6 +88,13 @@ def show_holder(show_holder):
         click.echo(f"Holder ID is: {holder_id}".format(show_holder))
 
 @cli.command()
+@click.option('--show_all', required=False, default ='World',
+        help ='Show all API data')
+def show_all(show_all):
+    showall()
+    click.echo(f"Session Data: {showallthedata}".format(show_all))
+
+@cli.command()
 @click.option('--show_time', required=False, default ='World',
         help ='Show existing holder if any')
 def show_time(show_time):
@@ -97,7 +109,6 @@ def show_time(show_time):
     #table.add_row(startDateFriendly)
     #table.add_row(endDateFriendly)
     #console.print(table)
-
 
 if __name__=="__main__":
     cli()
