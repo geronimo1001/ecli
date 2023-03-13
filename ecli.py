@@ -1,7 +1,9 @@
 import click
 import json
 import requests
+import time
 import datetime
+import dateutil.relativedelta
 from rich.console import Console
 from rich.table import Table
 
@@ -18,17 +20,27 @@ elif uservar == 2:
     useruuid = "4d89h9ev72jmft8"
 
 # Set URL based on selected user
-url = requests.get(userapiurl)
-text = url.text
+uurl = requests.get(userapiurl)
+text = uurl.text
 #sessionDict = json.loads(text)
 
 #print(sessionDict)
 
 def get_holder_info():
     global holder_id
+    global holderurl
+    global htext
+    #global hsessionDict
+    global holder_name
     sessionDict = json.loads(text)
     holder_id = sessionDict['chastitysession']['holderid']
     #print(holder_id)
+    holderurl = "https://api.emlalock.com/info?userid=" + holder_id
+    hurl = requests.get(holderurl)
+    htext = hurl.text
+    #hsessionDict = json.loads(htext)
+    #holder_name = hsessionDict['user']['username']
+    #print(holderurl)
 
 def get_time_stats():
     global startDate
@@ -37,18 +49,26 @@ def get_time_stats():
     global endDateFriendly
     global timeInLock
     global timeInLockFriendly
+    global currentTime
+    global timePassed
+    global timePassedFriendly
     sessionDict = json.loads(text)
     startDate = sessionDict['chastitysession']['startdate']
     startDateFriendly = datetime.datetime.fromtimestamp(startDate)
     endDate = sessionDict['chastitysession']['enddate']
     endDateFriendly = datetime.datetime.fromtimestamp(endDate)
-    timeInLock = endDate - startDate
+    timeInLock =  startDate - endDate
     timeInLockFriendly = datetime.datetime.fromtimestamp(timeInLock)
+    currentTime = datetime.datetime.now().timestamp()
+    timePassed =  currentTime - startDate
+    timePassedFriendly = time.strftime('%H:%M:%S', time.gmtime(timePassed))
 
 def showall():
     global showallthedata
+    global sessionDict
     sessionDict = json.loads(text)
-    showallthedata = sessionDict['chastitysession']['duration']
+    #showallthedata = sessionDict['chastitysession']['duration']
+    showallthedata = url.text
 
 @click.group()
 def cli():
@@ -75,34 +95,38 @@ def hello(string):
     click.echo("Hello, {}".format(string))
 
 @cli.command()
-@click.option('--show_holder', required=False, default ='World',
+@click.option('--show_holder', required=False,
         help ='Show existing holder if any')
 def show_holder(show_holder):
     #starting_holder_id = sessionDict['chastitysession']['holderid']
     get_holder_info()
     if holder_id == useruuid:
         click.echo("You do not have a keyholder.".format(show_holder))
+    elif holder_id == "yqh85r5gp6r42mw":
+        click.echo("Your keyholder is Mist Angel".format(show_holder))
     else:
+        click.echo(" ".format(show_holder))
         # Need to fix this
         #click.echo(f"Holder ID is: {holder_id}".format(show_time))
-        click.echo(f"Holder ID is: {holder_id}".format(show_holder))
+        #click.echo(f"Holder ID is: {holderurl}".format(show_holder))
 
 @cli.command()
-@click.option('--show_all', required=False, default ='World',
+@click.option('--show_all', required=False,
         help ='Show all API data')
 def show_all(show_all):
     showall()
-    click.echo(f"Session Data: {showallthedata}".format(show_all))
+    #click.echo(f"Session Data: {text}".format(show_all))
+    click.echo(f"Session Start: {sessionDict}".format(show_all))
 
 @cli.command()
-@click.option('--show_time', required=False, default ='World',
-        help ='Show existing holder if any')
+@click.option('--show_time', required=False, help ='Show existing holder if any')
 def show_time(show_time):
     #starting_holder_id = sessionDict['chastitysession']['holderid']
     get_time_stats()
     click.echo(f"Session Start: {startDateFriendly}".format(show_time))
     click.echo(f"Session End:   {endDateFriendly}".format(show_time))
-    click.echo(f"Time Locked:   {timeInLockFriendly}".format(show_time))
+    click.echo(f"Time Passed:   (h:m:s)    {timePassedFriendly}".format(show_time))
+    #click.echo(f"Time Locked:   {timeInLockFriendly}".format(show_time))
     #table = Table(show_header=True, header_style="blue")
     #table.add_column("Start Date")
     #table.add_column("End Date")
