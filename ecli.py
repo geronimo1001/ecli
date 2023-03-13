@@ -30,17 +30,20 @@ def get_holder_info():
     global holder_id
     global holderurl
     global htext
-    #global hsessionDict
+    global hsessionDict
     global holder_name
     sessionDict = json.loads(text)
     holder_id = sessionDict['chastitysession']['holderid']
+    #API access to holder requires their API key
     #print(holder_id)
-    holderurl = "https://api.emlalock.com/info?userid=" + holder_id
-    hurl = requests.get(holderurl)
-    htext = hurl.text
+    #holderurl = "https://api.emlalock.com/info?userid=" + holder_id
+    #if holder_id == "yqh85r5gp6r42mw":
+        #holderurl = "https://api.emlalock.com/info?userid=yqh85r5gp6r42mw"
+        #holderurl = "https://api.emlalock.com/info?userid=4d89h9ev72jmft8"
+    #hurl = requests.get(holderurl)
+    #htext = hurl.text
     #hsessionDict = json.loads(htext)
-    #holder_name = hsessionDict['user']['username']
-    #print(holderurl)
+    #holder_name = hsessionDict['user']['lastclick']
 
 def get_time_stats():
     global startDate
@@ -72,7 +75,7 @@ def showall():
     global sessionDict
     sessionDict = json.loads(text)
     #showallthedata = sessionDict['chastitysession']['duration']
-    showallthedata = url.text
+    showallthedata = uurl.text
 
 @click.group()
 def cli():
@@ -107,20 +110,20 @@ def show_holder(show_holder):
     if holder_id == useruuid:
         click.echo("Currently there is no keyholder.".format(show_holder))
     elif holder_id == "yqh85r5gp6r42mw":
-        click.echo("Your keyholder is Mist Angel".format(show_holder))
+        click.echo(f"Your keyholder is Mistress Angel.".format(show_holder))
     else:
         click.echo(" ".format(show_holder))
         # Need to fix this
         #click.echo(f"Holder ID is: {holder_id}".format(show_time))
         #click.echo(f"Holder ID is: {holderurl}".format(show_holder))
 
-@cli.command()
-@click.option('--show_all', required=False,
-        help ='Show all API data')
-def show_all(show_all):
-    showall()
-    #click.echo(f"Session Data: {text}".format(show_all))
-    click.echo(f"Session Start: {sessionDict}".format(show_all))
+#@cli.command()
+#@click.option('--show_all', required=False,
+#        help ='Show all API data')
+#def show_all(show_all):
+#    showall()
+#    #click.echo(f"Session Data: {text}".format(show_all))
+#    click.echo(f"Session Start: {sessionDict}".format(show_all))
 
 @cli.command()
 @click.option('--show_time', required=False, help ='Show existing holder if any')
