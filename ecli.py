@@ -101,7 +101,7 @@ def show_holder(show_holder):
     #starting_holder_id = sessionDict['chastitysession']['holderid']
     get_holder_info()
     if holder_id == useruuid:
-        click.echo("You do not have a keyholder.".format(show_holder))
+        click.echo("Currently there is no keyholder.".format(show_holder))
     elif holder_id == "yqh85r5gp6r42mw":
         click.echo("Your keyholder is Mist Angel".format(show_holder))
     else:
