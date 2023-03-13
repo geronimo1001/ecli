@@ -52,6 +52,8 @@ def get_time_stats():
     global currentTime
     global timePassed
     global timePassedFriendly
+    global maxTime
+    global maxTimeFriendly
     sessionDict = json.loads(text)
     startDate = sessionDict['chastitysession']['startdate']
     startDateFriendly = datetime.datetime.fromtimestamp(startDate)
@@ -62,6 +64,8 @@ def get_time_stats():
     currentTime = datetime.datetime.now().timestamp()
     timePassed =  currentTime - startDate
     timePassedFriendly = time.strftime('%H:%M:%S', time.gmtime(timePassed))
+    maxTime = startDate + sessionDict['chastitysession']['maxduration']
+    maxTimeFriendly = datetime.datetime.fromtimestamp(maxTime)
 
 def showall():
     global showallthedata
@@ -123,9 +127,20 @@ def show_all(show_all):
 def show_time(show_time):
     #starting_holder_id = sessionDict['chastitysession']['holderid']
     get_time_stats()
-    click.echo(f"Session Start: {startDateFriendly}".format(show_time))
-    click.echo(f"Session End:   {endDateFriendly}".format(show_time))
-    click.echo(f"Time Passed:   (h:m:s)    {timePassedFriendly}".format(show_time))
+    
+    if startDate == 0:
+        click.echo(f"Session Start:            disabled".format(show_time))
+    else:
+        click.echo(f"Session Start: {startDateFriendly}".format(show_time))
+    if endDate == 0:
+        click.echo(f"Session End:              disabled".format(show_time))
+    else:
+        click.echo(f"Session End:   {endDateFriendly}".format(show_time))
+    if timePassed == 0:
+        click.echo(f"Time Passed:               ".format(show_time))
+    else:
+        click.echo(f"Time Passed:   (h:m:s)    {timePassedFriendly}".format(show_time))
+    click.echo(f"Max Duration:  {maxTimeFriendly}".format(show_time))
     #click.echo(f"Time Locked:   {timeInLockFriendly}".format(show_time))
     #table = Table(show_header=True, header_style="blue")
     #table.add_column("Start Date")
